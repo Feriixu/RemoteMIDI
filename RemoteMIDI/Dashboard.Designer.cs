@@ -52,11 +52,10 @@
             this.metroLabel5 = new MetroFramework.Controls.MetroLabel();
             this.metroButtonSendTestToRemote = new MetroFramework.Controls.MetroButton();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
-            this.metroLabelNumberOfDevices = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
             this.metroComboBoxInputDevice = new MetroFramework.Controls.MetroComboBox();
             this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
+            this.metroButtonRefreshDeviceList = new MetroFramework.Controls.MetroButton();
             this.metroPanelConnection.SuspendLayout();
             this.metroPanel1.SuspendLayout();
             this.metroPanel2.SuspendLayout();
@@ -473,8 +472,7 @@
             // metroPanel2
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.metroPanel2.Controls.Add(this.metroLabelNumberOfDevices);
-            this.metroPanel2.Controls.Add(this.metroLabel10);
+            this.metroPanel2.Controls.Add(this.metroButtonRefreshDeviceList);
             this.metroPanel2.Controls.Add(this.metroLabel9);
             this.metroPanel2.Controls.Add(this.metroComboBoxInputDevice);
             this.metroPanel2.Controls.Add(this.metroLabel8);
@@ -491,32 +489,10 @@
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel2.VerticalScrollbarSize = 10;
             // 
-            // metroLabelNumberOfDevices
-            // 
-            this.metroLabelNumberOfDevices.AutoSize = true;
-            this.metroLabelNumberOfDevices.Location = new System.Drawing.Point(150, 60);
-            this.metroLabelNumberOfDevices.Name = "metroLabelNumberOfDevices";
-            this.metroLabelNumberOfDevices.Size = new System.Drawing.Size(30, 19);
-            this.metroLabelNumberOfDevices.Style = MetroFramework.MetroColorStyle.Lime;
-            this.metroLabelNumberOfDevices.TabIndex = 11;
-            this.metroLabelNumberOfDevices.Text = "nan";
-            this.metroLabelNumberOfDevices.Theme = MetroFramework.MetroThemeStyle.Dark;
-            // 
-            // metroLabel10
-            // 
-            this.metroLabel10.AutoSize = true;
-            this.metroLabel10.Location = new System.Drawing.Point(21, 60);
-            this.metroLabel10.Name = "metroLabel10";
-            this.metroLabel10.Size = new System.Drawing.Size(123, 19);
-            this.metroLabel10.Style = MetroFramework.MetroColorStyle.Lime;
-            this.metroLabel10.TabIndex = 11;
-            this.metroLabel10.Text = "Number of devices:";
-            this.metroLabel10.Theme = MetroFramework.MetroThemeStyle.Dark;
-            // 
             // metroLabel9
             // 
             this.metroLabel9.AutoSize = true;
-            this.metroLabel9.Location = new System.Drawing.Point(21, 89);
+            this.metroLabel9.Location = new System.Drawing.Point(21, 71);
             this.metroLabel9.Name = "metroLabel9";
             this.metroLabel9.Size = new System.Drawing.Size(82, 19);
             this.metroLabel9.Style = MetroFramework.MetroColorStyle.Lime;
@@ -528,7 +504,7 @@
             // 
             this.metroComboBoxInputDevice.FormattingEnabled = true;
             this.metroComboBoxInputDevice.ItemHeight = 23;
-            this.metroComboBoxInputDevice.Location = new System.Drawing.Point(109, 85);
+            this.metroComboBoxInputDevice.Location = new System.Drawing.Point(109, 67);
             this.metroComboBoxInputDevice.Name = "metroComboBoxInputDevice";
             this.metroComboBoxInputDevice.Size = new System.Drawing.Size(169, 29);
             this.metroComboBoxInputDevice.Style = MetroFramework.MetroColorStyle.Lime;
@@ -549,6 +525,18 @@
             this.metroLabel8.TabIndex = 5;
             this.metroLabel8.Text = "Input MIDI";
             this.metroLabel8.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // metroButtonRefreshDeviceList
+            // 
+            this.metroButtonRefreshDeviceList.Location = new System.Drawing.Point(109, 102);
+            this.metroButtonRefreshDeviceList.Name = "metroButtonRefreshDeviceList";
+            this.metroButtonRefreshDeviceList.Size = new System.Drawing.Size(169, 23);
+            this.metroButtonRefreshDeviceList.Style = MetroFramework.MetroColorStyle.Lime;
+            this.metroButtonRefreshDeviceList.TabIndex = 12;
+            this.metroButtonRefreshDeviceList.Text = "Refresh device list";
+            this.metroButtonRefreshDeviceList.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroButtonRefreshDeviceList.UseSelectable = true;
+            this.metroButtonRefreshDeviceList.Click += new System.EventHandler(this.RefreshDevices);
             // 
             // Dashboard
             // 
@@ -598,12 +586,11 @@
         private MetroFramework.Controls.MetroLabel metroLabel5;
         private MetroFramework.Controls.MetroButton metroButtonSendTestToRemote;
         private MetroFramework.Controls.MetroPanel metroPanel2;
-        private MetroFramework.Controls.MetroLabel metroLabelNumberOfDevices;
-        private MetroFramework.Controls.MetroLabel metroLabel10;
         private MetroFramework.Controls.MetroLabel metroLabel9;
         private MetroFramework.Controls.MetroComboBox metroComboBoxInputDevice;
         private MetroFramework.Controls.MetroLabel metroLabel8;
         private MetroFramework.Controls.MetroButton metroButtonCopyIP;
         private MetroFramework.Controls.MetroButton metroButtonDisconnect;
+        private MetroFramework.Controls.MetroButton metroButtonRefreshDeviceList;
     }
 }

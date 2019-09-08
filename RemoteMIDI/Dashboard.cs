@@ -21,9 +21,19 @@ namespace RemoteMIDI
         private NetworkStream stream;
         private InputPort inputPort;
 
+
+        private delegate void SafeLogDelegate(string text);
         private void Log(string message)
         {
-            metroTextBoxConsole.AppendText($"[{DateTime.Now.ToString()}] {message}" + Environment.NewLine);
+            if (metroTextBoxConsole.InvokeRequired)
+            {
+                var d = new SafeLogDelegate(Log);
+                metroTextBoxConsole.Invoke(d, new object[] { message });
+            }
+            else
+            {
+                metroTextBoxConsole.AppendText($"[{DateTime.Now.ToString()}] {message}" + Environment.NewLine);
+            }
         }
 
         public Dashboard()
@@ -54,14 +64,7 @@ namespace RemoteMIDI
                 Log("Failed to get IP");
             }
 
-            this.metroLabelNumberOfDevices.Text = InputPort.InputCount.ToString();
-            for (uint i = 0; i < InputPort.InputCount; i++)
-            {
-                MIDIINCAPS caps2 = new MIDIINCAPS();
-                InputPort.GetDeviceInfo(i, ref caps2, (uint)Marshal.SizeOf(typeof(MIDIINCAPS)));
-                metroComboBoxInputDevice.Items.Add(caps2.szPname);
-            }
-            metroComboBoxInputDevice.SelectedIndex = 0;
+            this.RefreshDevices(this, null);
             this.metroTextBoxPort.Text = DefaultPort.ToString();
         }
         ~Dashboard()
@@ -264,6 +267,10 @@ namespace RemoteMIDI
         }
         private void MetroComboBoxInputDevice_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (metroComboBoxInputDevice.SelectedIndex == -1)
+            {
+                return;
+            }
             Log("Changing input device ...");
 
             if (this.inputPort != null)
@@ -279,13 +286,12 @@ namespace RemoteMIDI
                     Log("Closing previous port ...");
                     inputPort.Close();
                 }
-
+                inputPort = null;
             }
-            else
-            {
-                inputPort = new InputPort();
-                inputPort.MIDIInputReceived += MIDIInputReceived;
-            }
+            Log("Creating new input port ...");
+            inputPort = new InputPort();
+            inputPort.MIDIInputReceived += MIDIInputReceived;
+            Log("Input port created.");
 
             Log("Opening port ...");
             var openResult = inputPort.Open(metroComboBoxInputDevice.SelectedIndex);
@@ -296,6 +302,7 @@ namespace RemoteMIDI
             else
             {
                 Log("Error while opening port!");
+                this.metroComboBoxInputDevice.SelectedIndex = -1;
                 MessageBox.Show("Can't use MIDI device! Is this device already in use by another program?");
                 return;
             }
@@ -308,6 +315,7 @@ namespace RemoteMIDI
             else
             {
                 Log("Error while starting to listen on port!");
+                this.metroComboBoxInputDevice.SelectedIndex = -1;
                 MessageBox.Show("Can't start listening on MIDI device input! Is this device already in use by another program?");
                 inputPort.Close();
                 return;
@@ -318,7 +326,16 @@ namespace RemoteMIDI
 
         private void MIDIInputReceived(object sender, MIDIMessage e)
         {
-            Log("Received local MIDI data!");
+            var msgBytes = BitConverter.GetBytes(e.wMsg);
+            var param1bytes = BitConverter.GetBytes(e.dwParam1);
+            var param2bytes = BitConverter.GetBytes(e.dwParam2);
+
+            var command = param1bytes[0];
+            var note = param1bytes[1];
+            var velocity = param2bytes[2];
+
+            Log($"Received local MIDI data: 0x{e.dwParam1.ToString("X")}");
+            vMIDI.sendCommand(e.Data);
             if (client == null)
                 return;
             if (client.Connected)
@@ -333,6 +350,37 @@ namespace RemoteMIDI
                 {
                     Log("Couldn't send data! " + ex.Message);
                 }
+            }
+        }
+
+        private void RefreshDevices(object sender, EventArgs e)
+        {
+            Log("Refreshing device list ...");
+
+            metroComboBoxInputDevice.Items.Clear();
+
+            // Close old port
+            if (this.inputPort != null)
+            {
+                // Make sure port is closed and stopped
+                if (this.inputPort.Started)
+                {
+                    Log("Stopping previous port ...");
+                    inputPort.Stop();
+                }
+                if (this.inputPort.Opened)
+                {
+                    Log("Closing previous port ...");
+                    inputPort.Close();
+                }
+                inputPort = null;
+            }
+
+            for (uint i = 0; i < InputPort.InputCount; i++)
+            {
+                MIDIINCAPS caps2 = new MIDIINCAPS();
+                InputPort.GetDeviceInfo(i, ref caps2, (uint)Marshal.SizeOf(typeof(MIDIINCAPS)));
+                metroComboBoxInputDevice.Items.Add(caps2.szPname);
             }
         }
     }

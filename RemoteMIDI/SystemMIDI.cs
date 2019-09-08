@@ -6,6 +6,9 @@ namespace RemoteMIDI
     public class MIDIMessage : EventArgs
     {
         public byte[] Data { get; set; }
+        public int wMsg { get; set; }
+        public int dwParam1 { get; set; }
+        public int dwParam2 { get; set; }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -107,14 +110,18 @@ namespace RemoteMIDI
             int dwParam2)
         {
             // Receive messages here
+            var data = BitConverter.GetBytes(dwParam1);
             var e = new MIDIMessage()
             {
                 Data = new byte[]
                 {
-                    (byte)wMsg,
-                    (byte)dwParam1,
-                    (byte)dwParam2
-                }
+                    data[0],
+                    data[1],
+                    data[2]
+                },
+                wMsg = wMsg,
+                dwParam1 = dwParam1,
+                dwParam2 = dwParam2
             };
             MIDIInputReceived?.Invoke(this, e);
         }
