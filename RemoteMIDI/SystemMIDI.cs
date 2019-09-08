@@ -66,30 +66,29 @@ namespace RemoteMIDI
 
         public bool Close()
         {
-            var result = NativeMethods.midiInClose(this.handle)
-                == NativeMethods.MMSYSERR_NOERROR;
-            this.handle = IntPtr.Zero;
             this.Opened = false;
-            return result;
+            this.handle = IntPtr.Zero; 
+            return NativeMethods.midiInClose(this.handle)
+                == NativeMethods.MMSYSERR_NOERROR;
         }
 
         public bool Open(int id)
         {
-            this.Opened = true;
-            return NativeMethods.midiInOpen(
+            this.Opened = NativeMethods.midiInOpen(
                 out this.handle,
                 id,
                 this.midiInProc,
                 IntPtr.Zero,
                 NativeMethods.CALLBACK_FUNCTION)
-                == NativeMethods.MMSYSERR_NOERROR;
+                == NativeMethods.MMSYSERR_NOERROR; ;
+            return this.Opened;
         }
 
         public bool Start()
         {
-            this.Started = true;
-            return NativeMethods.midiInStart(this.handle)
-                == NativeMethods.MMSYSERR_NOERROR;
+            this.Started = NativeMethods.midiInStart(this.handle)
+                == NativeMethods.MMSYSERR_NOERROR; ;
+            return this.Started;
         }
 
         public bool Stop()

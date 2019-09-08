@@ -23,7 +23,7 @@ namespace RemoteMIDI
 
         private void Log(string message)
         {
-            metroTextBoxConsole.Text += $"[{DateTime.Now.ToString()}] {message}" + Environment.NewLine;
+            metroTextBoxConsole.AppendText($"[{DateTime.Now.ToString()}] {message}" + Environment.NewLine);
         }
 
         public Dashboard()
@@ -288,15 +288,39 @@ namespace RemoteMIDI
             }
 
             Log("Opening port ...");
-            inputPort.Open(metroComboBoxInputDevice.SelectedIndex);
+            var openResult = inputPort.Open(metroComboBoxInputDevice.SelectedIndex);
+            if (openResult)
+            {
+                Log("Successfully opened port!");
+            }
+            else
+            {
+                Log("Error while opening port!");
+                MessageBox.Show("Can't use MIDI device! Is this device already in use by another program?");
+                return;
+            }
             Log("Starting port ...");
-            inputPort.Start();
+            var startResult = inputPort.Start();
+            if (openResult)
+            {
+                Log("Successfully started listening on port!");
+            }
+            else
+            {
+                Log("Error while starting to listen on port!");
+                MessageBox.Show("Can't start listening on MIDI device input! Is this device already in use by another program?");
+                inputPort.Close();
+                return;
+            }
+
             Log("Device change done!");
         }
 
         private void MIDIInputReceived(object sender, MIDIMessage e)
         {
             Log("Received local MIDI data!");
+            if (client == null)
+                return;
             if (client.Connected)
             {
                 Log("Sending data ...");
