@@ -79,7 +79,7 @@ namespace RemoteMIDI
             Log("Validating inputs ...");
             if (!IPAddress.TryParse(this.metroTextBoxIP.Text, out var remoteIP))
             {
-                MessageBox.Show("Invalid IP address!");
+                MessageBox.Show("Invalid IP address!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Log("Invalid input detected!");
                 return;
             }
@@ -87,14 +87,14 @@ namespace RemoteMIDI
             {
                 if (remotePort < 49152 || remotePort > 65535)
                 {
-                    MessageBox.Show("Invalid Port! Range: 49152 - 65535");
+                    MessageBox.Show("Invalid Port! Range: 49152 - 65535", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Log("Invalid input detected!");
                     return;
                 }
             }
             else
             {
-                MessageBox.Show("Invalid Port!");
+                MessageBox.Show("Invalid Port!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Log("Invalid input detected!");
                 return;
             }
@@ -109,36 +109,30 @@ namespace RemoteMIDI
                 this.stream = this.client.GetStream();
                 this.backgroundWorkerReceiveMIDI.RunWorkerAsync();
                 Log("Connected successfully!");
-                MessageBox.Show("Connected!");
+                MessageBox.Show("Connected!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 Log("Error while connecting!");
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void MetroButtonConnectServer_Click(object sender, EventArgs e)
         {
             Log("Validating inputs ...");
 
-            if (!IPAddress.TryParse(this.metroTextBoxIP.Text, out var remoteIP))
-            {
-                MessageBox.Show("Invalid IP address!");
-                Log("Invalid input detected!");
-                return;
-            }
             if (int.TryParse(this.metroTextBoxPort.Text, out var remotePort))
             {
                 if (remotePort < 49152 || remotePort > 65535)
                 {
-                    MessageBox.Show("Invalid Port! Range: 49152 - 65535");
+                    MessageBox.Show("Invalid Port! Range: 49152 - 65535", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Log("Invalid input detected!");
                     return;
                 }
             }
             else
             {
-                MessageBox.Show("Invalid Port!");
+                MessageBox.Show("Invalid Port!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Log("Invalid input detected!");
                 return;
             }
@@ -153,21 +147,31 @@ namespace RemoteMIDI
                 this.stream = this.client.GetStream();
                 this.backgroundWorkerReceiveMIDI.RunWorkerAsync();
                 Log("Connected successfully!");
-                MessageBox.Show("Connected!");
+                MessageBox.Show("Connected!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 Log("Error while connecting!");
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void BackgroundWorkerReceiveMIDI_DoWork(object sender, DoWorkEventArgs e)
         {
             while (true)
             {
-                var buffer = new byte[3];
-                stream.Read(buffer, 0, buffer.Length);
-                this.vMIDI.sendCommand(buffer); 
+                try
+                {
+                    var buffer = new byte[3];
+                    stream.Read(buffer, 0, buffer.Length);
+                    this.vMIDI.sendCommand(buffer);
+
+                }
+                catch (Exception ex)
+                {
+                    client.Close();
+                    stream.Close();
+                    MessageBox.Show("Connection lost.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
         private void MetroButtonSendTestToSelf_Click(object sender, EventArgs e)
@@ -212,6 +216,7 @@ namespace RemoteMIDI
                 Convert.ToByte(this.metroTextBoxTestVelocity.Text)
             };
             stream.Write(testData, 0, testData.Length);
+            stream.Flush();
             Thread.Sleep(500);
             testData = new byte[]
             {
@@ -220,6 +225,7 @@ namespace RemoteMIDI
                 Convert.ToByte(this.metroTextBoxTestVelocity.Text)
             };
             stream.Write(testData, 0, testData.Length);
+            stream.Flush();
             Log("Data sent!");
         }
         private bool CheckTestInput()
@@ -303,7 +309,7 @@ namespace RemoteMIDI
             {
                 Log("Error while opening port!");
                 this.metroComboBoxInputDevice.SelectedIndex = -1;
-                MessageBox.Show("Can't use MIDI device! Is this device already in use by another program?");
+                MessageBox.Show("Can't use MIDI device! Is this device already in use by another program?", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             Log("Starting port ...");
@@ -316,7 +322,7 @@ namespace RemoteMIDI
             {
                 Log("Error while starting to listen on port!");
                 this.metroComboBoxInputDevice.SelectedIndex = -1;
-                MessageBox.Show("Can't start listening on MIDI device input! Is this device already in use by another program?");
+                MessageBox.Show("Can't start listening on MIDI device input! Is this device already in use by another program?", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 inputPort.Close();
                 return;
             }
@@ -334,16 +340,24 @@ namespace RemoteMIDI
             var note = param1bytes[1];
             var velocity = param2bytes[2];
 
+
             Log($"Received local MIDI data: 0x{e.dwParam1.ToString("X")}");
-            vMIDI.sendCommand(e.Data);
+
+            // Loopback MIDI
+            if (metroCheckBoxLoopbackMIDI.Checked)
+                vMIDI.sendCommand(e.Data);
+
+            // Check if connected
             if (client == null)
                 return;
             if (client.Connected)
             {
+                // Send data to remote
                 Log("Sending data ...");
                 try
                 {
                     stream.Write(e.Data, 0, e.Data.Length);
+                    stream.Flush();
                     Log("Sent data!");
                 }
                 catch (Exception ex)
@@ -382,6 +396,11 @@ namespace RemoteMIDI
                 InputPort.GetDeviceInfo(i, ref caps2, (uint)Marshal.SizeOf(typeof(MIDIINCAPS)));
                 metroComboBoxInputDevice.Items.Add(caps2.szPname);
             }
+        }
+
+        private void MetroButtonDisconnect_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

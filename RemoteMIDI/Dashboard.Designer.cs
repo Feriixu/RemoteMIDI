@@ -52,10 +52,11 @@
             this.metroLabel5 = new MetroFramework.Controls.MetroLabel();
             this.metroButtonSendTestToRemote = new MetroFramework.Controls.MetroButton();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
+            this.metroButtonRefreshDeviceList = new MetroFramework.Controls.MetroButton();
             this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
             this.metroComboBoxInputDevice = new MetroFramework.Controls.MetroComboBox();
             this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
-            this.metroButtonRefreshDeviceList = new MetroFramework.Controls.MetroButton();
+            this.metroCheckBoxLoopbackMIDI = new MetroFramework.Controls.MetroCheckBox();
             this.metroPanelConnection.SuspendLayout();
             this.metroPanel1.SuspendLayout();
             this.metroPanel2.SuspendLayout();
@@ -280,6 +281,7 @@
             this.metroButtonDisconnect.Text = "Disconnect";
             this.metroButtonDisconnect.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroButtonDisconnect.UseSelectable = true;
+            this.metroButtonDisconnect.Click += new System.EventHandler(this.MetroButtonDisconnect_Click);
             // 
             // metroTextBoxConsole
             // 
@@ -472,6 +474,7 @@
             // metroPanel2
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.metroPanel2.Controls.Add(this.metroCheckBoxLoopbackMIDI);
             this.metroPanel2.Controls.Add(this.metroButtonRefreshDeviceList);
             this.metroPanel2.Controls.Add(this.metroLabel9);
             this.metroPanel2.Controls.Add(this.metroComboBoxInputDevice);
@@ -488,6 +491,18 @@
             this.metroPanel2.VerticalScrollbarBarColor = true;
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel2.VerticalScrollbarSize = 10;
+            // 
+            // metroButtonRefreshDeviceList
+            // 
+            this.metroButtonRefreshDeviceList.Location = new System.Drawing.Point(109, 102);
+            this.metroButtonRefreshDeviceList.Name = "metroButtonRefreshDeviceList";
+            this.metroButtonRefreshDeviceList.Size = new System.Drawing.Size(169, 23);
+            this.metroButtonRefreshDeviceList.Style = MetroFramework.MetroColorStyle.Lime;
+            this.metroButtonRefreshDeviceList.TabIndex = 12;
+            this.metroButtonRefreshDeviceList.Text = "Refresh device list";
+            this.metroButtonRefreshDeviceList.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroButtonRefreshDeviceList.UseSelectable = true;
+            this.metroButtonRefreshDeviceList.Click += new System.EventHandler(this.RefreshDevices);
             // 
             // metroLabel9
             // 
@@ -526,17 +541,17 @@
             this.metroLabel8.Text = "Input MIDI";
             this.metroLabel8.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
-            // metroButtonRefreshDeviceList
+            // metroCheckBoxLoopbackMIDI
             // 
-            this.metroButtonRefreshDeviceList.Location = new System.Drawing.Point(109, 102);
-            this.metroButtonRefreshDeviceList.Name = "metroButtonRefreshDeviceList";
-            this.metroButtonRefreshDeviceList.Size = new System.Drawing.Size(169, 23);
-            this.metroButtonRefreshDeviceList.Style = MetroFramework.MetroColorStyle.Lime;
-            this.metroButtonRefreshDeviceList.TabIndex = 12;
-            this.metroButtonRefreshDeviceList.Text = "Refresh device list";
-            this.metroButtonRefreshDeviceList.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this.metroButtonRefreshDeviceList.UseSelectable = true;
-            this.metroButtonRefreshDeviceList.Click += new System.EventHandler(this.RefreshDevices);
+            this.metroCheckBoxLoopbackMIDI.AutoSize = true;
+            this.metroCheckBoxLoopbackMIDI.Location = new System.Drawing.Point(21, 143);
+            this.metroCheckBoxLoopbackMIDI.Name = "metroCheckBoxLoopbackMIDI";
+            this.metroCheckBoxLoopbackMIDI.Size = new System.Drawing.Size(238, 15);
+            this.metroCheckBoxLoopbackMIDI.Style = MetroFramework.MetroColorStyle.Teal;
+            this.metroCheckBoxLoopbackMIDI.TabIndex = 13;
+            this.metroCheckBoxLoopbackMIDI.Text = "Also send MIDI to local RemoteMIDI port";
+            this.metroCheckBoxLoopbackMIDI.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroCheckBoxLoopbackMIDI.UseSelectable = true;
             // 
             // Dashboard
             // 
@@ -592,5 +607,6 @@
         private MetroFramework.Controls.MetroButton metroButtonCopyIP;
         private MetroFramework.Controls.MetroButton metroButtonDisconnect;
         private MetroFramework.Controls.MetroButton metroButtonRefreshDeviceList;
+        private MetroFramework.Controls.MetroCheckBox metroCheckBoxLoopbackMIDI;
     }
 }
